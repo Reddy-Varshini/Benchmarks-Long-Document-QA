@@ -1,7 +1,6 @@
 import openai
 import torch
 from transformers import AutoTokenizer, AutoModel
-from torch.nn.functional import cosine_similarity
 from utils import *
 import json
 import os
