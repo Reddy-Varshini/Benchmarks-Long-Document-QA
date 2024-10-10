@@ -7,23 +7,8 @@ import os
 import time
 from multiprocessing import set_start_method
 import argparse
-import tiktoken
-
-# Initialize OpenAI API key
-
-
 from openai import OpenAI
 client = OpenAI()
-encoding = tiktoken.get_encoding("cl100k_base")
-
-
-def num_tokens_from_string(string, encoding_name="cl100k_base"):
-    """Returns the number of tokens in a text string."""
-
-    encoding = tiktoken.get_encoding(encoding_name)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
-
 
 
 def generate_embedding(text, model="text-embedding-3-large"):
@@ -39,14 +24,13 @@ def save_embeddings(embedding, path):
 
 
 # Function to process a single document and write the result to a JSON file
-def process_document(doc, embedding_dir):
-    context_window_map = {2750:(512,16), 4200:(1024,8), 8000:(2048,4), 15000:(4096,2), 27000:(8192,1)}
+def process_document(doc, embedding_dir, chunk_size):
 
     chunked_doc = chunk_doc(doc['context'], chunk_size=chunk_size)
     documents = [chunks.page_content for chunks in chunked_doc]
     del chunked_doc
 
-    base_path = f"{embedding_dir}/{context_window_map[chunk_size][0]}/{doc['id']}/"
+    base_path = f"{embedding_dir}/{chunk_size}/{doc['id']}/"
     os.makedirs(base_path, exist_ok=True)
 
     for idx, text in enumerate(documents):
